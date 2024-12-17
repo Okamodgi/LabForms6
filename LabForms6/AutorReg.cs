@@ -1,7 +1,5 @@
-using System;
 using System.Data.SqlClient;
 using System.Text;
-using System.Windows.Forms;
 using System.Security.Cryptography;
 
 namespace LabForms6
@@ -39,7 +37,7 @@ namespace LabForms6
             this.Load += AutorReg_Load;
             AutButton.Click += AutButton_Click;
 
-            txtPassword.UseSystemPasswordChar = true; // Включаем системные символы пароля
+            txtPassword.UseSystemPasswordChar = true;
         }
 
         private void AutorReg_Load(object sender, EventArgs e)
@@ -72,7 +70,7 @@ namespace LabForms6
         private void ShowPasswordCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             txtPassword.UseSystemPasswordChar = !checkPass.Checked;
-            txtPassword.Refresh(); // Обновление интерфейса
+            txtPassword.Refresh(); 
         }
 
         private void AutButton_Click(object sender, EventArgs e)
@@ -97,12 +95,12 @@ namespace LabForms6
                         {
                             if (reader.Read())
                             {
-                                string storedHashedPassword = reader.GetString(0); // Тип получаемого значения изменен на GetString() для совместимости
-                                string role = reader.GetString(1); // Тип получаемого значения изменен на GetString() для совместимости
+                                string storedHashedPassword = reader.GetString(0);
+                                string role = reader.GetString(1);
 
                                 if (storedHashedPassword == hashedPassword && role == selectedRole)
                                 {
-                                    MessageBox.Show("Авторизация успешна!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    
 
                                     Lk form2 = new Lk();
                                     form2.Show();
