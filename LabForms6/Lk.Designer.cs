@@ -90,6 +90,7 @@
             // 
             dataGridView3.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView3.Location = new Point(10, 123);
+
             dataGridView3.Name = "dataGridView3";
             dataGridView3.RowHeadersWidth = 51;
             dataGridView3.RowTemplate.Height = 29;
@@ -99,9 +100,9 @@
             // 
             // dataGridView1
             // 
-            dataGridView1.AutoGenerateColumns = false;
+            dataGridView1.AutoGenerateColumns = true;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.DataSource = dataGridView1;
+
             dataGridView1.Location = new Point(338, 98);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.RowHeadersWidth = 51;

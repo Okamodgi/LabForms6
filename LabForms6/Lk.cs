@@ -1,11 +1,16 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Data.SqlClient;
+using System.Windows.Forms;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace LabForms6
 {
     public partial class Lk : Form
     {
         string connectionString = "Server=DESKTOP-44TQDIG;Database=Laborat;Integrated Security=True;";
+        private Timer timer;
 
         public Lk()
         {
@@ -13,7 +18,54 @@ namespace LabForms6
             LoadComboBoxData();
             LoadData();
             LoadArchiveData();
+            MoveExpiredToArchive();
+            LoadDataForDataGridView1();
+
+
+            timer = new Timer();
+            timer.Interval = 600000;
+            timer.Elapsed += TimerElapsed;
+            timer.Start();
         }
+        private void TimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            MoveExpiredToArchive();
+        }
+        private void MoveExpiredToArchive()
+        {
+            using (SqlConnection myConnection = new SqlConnection(connectionString))
+            {
+                string query = @"
+                    INSERT INTO Archive (ID, [Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы], [Время закрытия])
+                    SELECT ID, [Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы], [Время закрытия]
+                    FROM Uslugi
+                    WHERE [Время закрытия] <= GETDATE();
+
+                    DELETE FROM Uslugi
+                    WHERE [Время закрытия] <= GETDATE();
+                ";
+
+                try
+                {
+                    myConnection.Open();
+                    using (SqlCommand command = new SqlCommand(query, myConnection))
+                    {
+                        int rowsAffected = command.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Данные перенесены в архив.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LoadData(); 
+                            LoadArchiveData();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при переносе данных: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
 
         private void LoadComboBoxData()
         {
@@ -91,17 +143,22 @@ namespace LabForms6
             }
         }
 
+
         private void MoveToArchive(int id)
         {
             using (SqlConnection myConnection = new SqlConnection(connectionString))
             {
                 string query = @"
             SET IDENTITY_INSERT Archive ON;
+
             INSERT INTO Archive (ID, [Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы], [Время закрытия])
-            SELECT ID, [Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы], [Время закрытия] 
+            SELECT ID, [Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы], [Время закрытия]
             FROM Uslugi WHERE ID = @id;
+
             SET IDENTITY_INSERT Archive OFF;
-            DELETE FROM Uslugi WHERE ID = @id";
+
+            DELETE FROM Uslugi WHERE ID = @id;
+        ";
 
                 try
                 {
@@ -126,6 +183,25 @@ namespace LabForms6
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Ошибка при переносе данных: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+        private void LoadDataForDataGridView1()
+        {
+            using (SqlConnection myConnection = new SqlConnection(connectionString))
+            {
+                string query = "SELECT * FROM Data";
+                SqlDataAdapter dataAdapter = new SqlDataAdapter(query, myConnection);
+                DataTable dataTable = new DataTable();
+                try
+                {
+                    myConnection.Open();
+                    dataAdapter.Fill(dataTable);
+                    dataGridView1.DataSource = dataTable;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка загрузки данных для dataGridView1: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -157,7 +233,7 @@ namespace LabForms6
                 return;
             }
 
-            DateTime currentTimePlusOneMinute = DateTime.Now.AddMinutes(1); // Получаем текущее время + 1 минута
+            DateTime currentTimePlusOneMinute = DateTime.Now.AddMinutes(20);
 
             string query = @"INSERT INTO Uslugi ([Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы], [Время закрытия])
                      VALUES (@login, @schet, @usluga, @status, @tipProblemy, @opisanie, @timeClose)";
@@ -175,7 +251,7 @@ namespace LabForms6
                         command.Parameters.AddWithValue("@status", status);
                         command.Parameters.AddWithValue("@tipProblemy", tipProblemy);
                         command.Parameters.AddWithValue("@opisanie", opisanie);
-                        command.Parameters.AddWithValue("@timeClose", currentTimePlusOneMinute); // Добавляем время закрытия
+                        command.Parameters.AddWithValue("@timeClose", currentTimePlusOneMinute);
 
                         int rowsAffected = command.ExecuteNonQuery();
                         if (rowsAffected > 0)
