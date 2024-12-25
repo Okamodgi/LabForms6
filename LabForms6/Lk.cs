@@ -95,7 +95,14 @@ namespace LabForms6
         {
             using (SqlConnection myConnection = new SqlConnection(connectionString))
             {
-                string query = "INSERT INTO Archive SELECT * FROM Uslugi WHERE ID = @id; DELETE FROM Uslugi WHERE ID = @id";
+                string query = @"
+            SET IDENTITY_INSERT Archive ON;
+            INSERT INTO Archive (ID, [Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы], [Время закрытия])
+            SELECT ID, [Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы], [Время закрытия] 
+            FROM Uslugi WHERE ID = @id;
+            SET IDENTITY_INSERT Archive OFF;
+            DELETE FROM Uslugi WHERE ID = @id";
+
                 try
                 {
                     myConnection.Open();
@@ -108,6 +115,7 @@ namespace LabForms6
                         {
                             MessageBox.Show("Данные перенесены в архив.", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             LoadData();
+                            LoadArchiveData();
                         }
                         else
                         {
@@ -149,8 +157,10 @@ namespace LabForms6
                 return;
             }
 
-            string query = @"INSERT INTO Uslugi ([Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы])
-                     VALUES (@login, @schet, @usluga, @status, @tipProblemy, @opisanie)";
+            DateTime currentTimePlusOneMinute = DateTime.Now.AddMinutes(1); // Получаем текущее время + 1 минута
+
+            string query = @"INSERT INTO Uslugi ([Логин абонента], [Лицевой счет], Услуга, Статус, [Тип проблемы], [Описание проблемы], [Время закрытия])
+                     VALUES (@login, @schet, @usluga, @status, @tipProblemy, @opisanie, @timeClose)";
 
             using (SqlConnection myConnection = new SqlConnection(connectionString))
             {
@@ -165,6 +175,7 @@ namespace LabForms6
                         command.Parameters.AddWithValue("@status", status);
                         command.Parameters.AddWithValue("@tipProblemy", tipProblemy);
                         command.Parameters.AddWithValue("@opisanie", opisanie);
+                        command.Parameters.AddWithValue("@timeClose", currentTimePlusOneMinute); // Добавляем время закрытия
 
                         int rowsAffected = command.ExecuteNonQuery();
                         if (rowsAffected > 0)
@@ -184,6 +195,7 @@ namespace LabForms6
                 }
             }
         }
+
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
