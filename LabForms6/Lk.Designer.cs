@@ -48,10 +48,13 @@
             comboBoxState = new ComboBox();
             comboBoxUsluga = new ComboBox();
             groupBox2 = new GroupBox();
+            dataGridView2 = new DataGridView();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView3).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dataGridView2).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -92,6 +95,7 @@
             dataGridView3.RowTemplate.Height = 29;
             dataGridView3.Size = new Size(304, 141);
             dataGridView3.TabIndex = 3;
+            dataGridView3.CellContentClick += dataGridView3_CellContentClick;
             // 
             // dataGridView1
             // 
@@ -266,11 +270,22 @@
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(dataGridView2);
             groupBox2.Location = new Point(786, 90);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(165, 440);
             groupBox2.TabIndex = 6;
             groupBox2.TabStop = false;
+            // 
+            // dataGridView2
+            // 
+            dataGridView2.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView2.Location = new Point(0, 8);
+            dataGridView2.Name = "dataGridView2";
+            dataGridView2.RowHeadersWidth = 51;
+            dataGridView2.RowTemplate.Height = 29;
+            dataGridView2.Size = new Size(165, 432);
+            dataGridView2.TabIndex = 7;
             // 
             // Lk
             // 
@@ -291,6 +306,8 @@
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dataGridView2).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -319,5 +336,6 @@
         private DataGridViewTextBoxColumn Ab_number;
         private DataGridViewTextBoxColumn LC_Column;
         private DataGridViewTextBoxColumn Oborud_Column;
+        private DataGridView dataGridView2;
     }
 }
