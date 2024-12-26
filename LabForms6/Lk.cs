@@ -176,7 +176,7 @@ namespace LabForms6
                         }
                         else
                         {
-                            MessageBox.Show("Не удалось перенести данные в архив.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                          
                         }
                     }
                 }
